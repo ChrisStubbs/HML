@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HML.Immunisation.Common", "HML.Immunisation.Common\HML.Immunisation.Common.csproj", "{DF9F7EC5-6A22-4781-B362-A38C2DC4D7F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HML.Immunisation.Models", "HML.Immunisation.Models\HML.Immunisation.Models.csproj", "{E3D2225C-0860-471E-8E9D-8151984B60A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HML.Immunisation.Providers", "HML.Immunisation.Providers\HML.Immunisation.Providers.csproj", "{EB80B4FE-5028-428B-88A9-4FD86DD7586E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HML.Immunisation.Test", "HML.Immunisation.Test\HML.Immunisation.Test.csproj", "{86C3010A-C271-4AD2-A482-4CE945AB8980}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HML.Immunisation.WebAPI", "HML.Immunisation.WebAPI\HML.Immunisation.WebAPI.csproj", "{536DEAE3-4A58-409C-B0DD-90F10A5B33B1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF9F7EC5-6A22-4781-B362-A38C2DC4D7F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF9F7EC5-6A22-4781-B362-A38C2DC4D7F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF9F7EC5-6A22-4781-B362-A38C2DC4D7F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF9F7EC5-6A22-4781-B362-A38C2DC4D7F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3D2225C-0860-471E-8E9D-8151984B60A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3D2225C-0860-471E-8E9D-8151984B60A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3D2225C-0860-471E-8E9D-8151984B60A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3D2225C-0860-471E-8E9D-8151984B60A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB80B4FE-5028-428B-88A9-4FD86DD7586E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB80B4FE-5028-428B-88A9-4FD86DD7586E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB80B4FE-5028-428B-88A9-4FD86DD7586E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB80B4FE-5028-428B-88A9-4FD86DD7586E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86C3010A-C271-4AD2-A482-4CE945AB8980}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86C3010A-C271-4AD2-A482-4CE945AB8980}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86C3010A-C271-4AD2-A482-4CE945AB8980}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86C3010A-C271-4AD2-A482-4CE945AB8980}.Release|Any CPU.Build.0 = Release|Any CPU
+		{536DEAE3-4A58-409C-B0DD-90F10A5B33B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{536DEAE3-4A58-409C-B0DD-90F10A5B33B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{536DEAE3-4A58-409C-B0DD-90F10A5B33B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{536DEAE3-4A58-409C-B0DD-90F10A5B33B1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
