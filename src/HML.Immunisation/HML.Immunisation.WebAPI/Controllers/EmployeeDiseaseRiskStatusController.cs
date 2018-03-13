@@ -6,6 +6,7 @@ using System.Web.Http;
 using HML.Immunisation.Common.Interfaces;
 using HML.Immunisation.Models.Entities;
 using HML.Immunisation.Providers.Interfaces;
+using HML.Immunisation.WebAPI.Mappers;
 
 namespace HML.Immunisation.WebAPI.Controllers
 {
@@ -13,19 +14,39 @@ namespace HML.Immunisation.WebAPI.Controllers
 	{
 		private readonly ILogger _logger;
 		private readonly IEmployeeDiseaseRiskStatusProvider _employeeDiseaseRiskStatusProvider;
+		private readonly IEmployeeDiseaseRiskStatusMapper _employeeDiseaseRiskStatusMapper;
 
 
-		public EmployeeDiseaseRiskStatusController(ILogger logger, IEmployeeDiseaseRiskStatusProvider employeeDiseaseRiskStatusProvider)
+		public EmployeeDiseaseRiskStatusController(
+			ILogger logger,
+			IEmployeeDiseaseRiskStatusProvider employeeDiseaseRiskStatusProvider,
+			IEmployeeDiseaseRiskStatusMapper employeeDiseaseRiskStatusMapper)
 		{
 			_logger = logger;
 			_employeeDiseaseRiskStatusProvider = employeeDiseaseRiskStatusProvider;
+			_employeeDiseaseRiskStatusMapper = employeeDiseaseRiskStatusMapper;
 		}
 
 		[HttpGet]
-		[Route("employees/{employeeId:int}/disease-risk-status")]
-		public async Task<IHttpActionResult> GetEmployeeDiseaseRiskStatusesAsync(int employeeId)
+		[Route("clients/{clientId:Guid}/employees/{employeeId:int}/disease-risk-status")]
+		public async Task<IHttpActionResult> GetEmployeeDiseaseRiskStatusesAsync(Guid clientId, int employeeId)
 		{
-			var diseaseRiskStatus = await _employeeDiseaseRiskStatusProvider.GetEmployeesDiseaseRiskStatusAsync(employeeId);
+			var diseaseRiskStatus = await _employeeDiseaseRiskStatusMapper.GetEmployeesDiseaseRiskStatusAsync(clientId,
+				await _employeeDiseaseRiskStatusProvider.GetEmployeesDiseaseRiskStatusAsync(employeeId));
+
+			if (diseaseRiskStatus == null || !diseaseRiskStatus.Any())
+			{
+				return NotFound();
+			}
+			return Ok(diseaseRiskStatus);
+		}
+
+		[HttpGet]
+		[Route("clients/{clientId:Guid}/employees/disease-risk-status")]
+		public async Task<IHttpActionResult> GetEmployeeDiseaseRiskStatusesAsync(Guid clientId)
+		{
+			var diseaseRiskStatus = await _employeeDiseaseRiskStatusMapper.GetEmployeesDiseaseRiskStatusAsync(clientId,
+					await  _employeeDiseaseRiskStatusProvider.GetClientsEmployeesDiseaseRiskStatusAsync(clientId));
 
 			if (diseaseRiskStatus == null || !diseaseRiskStatus.Any())
 			{
@@ -42,7 +63,11 @@ namespace HML.Immunisation.WebAPI.Controllers
 			{
 				if (ModelState.IsValid)
 				{
-					var updated = await _employeeDiseaseRiskStatusProvider.SaveAsync(employeeId, diseaseRiskStatusRecords);
+					var updated = await
+						_employeeDiseaseRiskStatusMapper.MapEmployeesDiseaseRiskStatusAsync(
+							await _employeeDiseaseRiskStatusProvider.SaveAsync(employeeId, diseaseRiskStatusRecords)
+							);
+					
 					if (updated != null)
 					{
 						return Ok(updated);

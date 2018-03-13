@@ -58,6 +58,9 @@
     <Compile Include="DbContexts\DiseaseRiskDbContext.cs" />
     <Compile Include="DbContexts\EmployeeDiseaseRiskStatusDbContext.cs" />
     <Compile Include="DbContexts\LookupsDbContext.cs" />
+    <Compile Include="Helpers\EntityExtensions.cs" />
+    <Compile Include="ViewModels\AuditInfo.cs" />
+    <Compile Include="ViewModels\EmployeeDiseaseRiskStatus.cs" />
     <Compile Include="ViewModels\Lookups.cs" />
     <Compile Include="Entities\BaseEntity.cs" />
     <Compile Include="Entities\ClientDiseaseRiskRecord.cs" />

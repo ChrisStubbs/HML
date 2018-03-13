@@ -1,14 +1,19 @@
 using System;
+using System.Linq;
 using System.Web.Http;
 using System.Web.Http.ExceptionHandling;
+using AutoMapper;
 using FluentValidation;
 using HML.Immunisation.Common;
 using HML.Immunisation.Common.Interfaces;
 using HML.Immunisation.Models.Entities;
 using HML.Immunisation.Providers;
 using HML.Immunisation.Providers.Interfaces;
+using HML.Immunisation.WebAPI.Controllers;
 using HML.Immunisation.WebAPI.Infrastructure;
+using HML.Immunisation.WebAPI.Mappers;
 using Unity;
+using Unity.Injection;
 
 namespace HML.Immunisation.WebAPI
 {
@@ -57,6 +62,7 @@ namespace HML.Immunisation.WebAPI
 			container.RegisterType<IExceptionLogger, WebApiExceptionLogger>();
 			container.RegisterType<ILookupsProvider, LookupsProvider>();
 			container.RegisterType<IEmployeeDiseaseRiskStatusProvider, EmployeeDiseaseRiskStatusProvider>();
+			container.RegisterType<IEmployeeDiseaseRiskStatusMapper, EmployeeDiseaseRiskStatusMapper>();
 			//register all validators
 			FluentValidation.AssemblyScanner.FindValidatorsInAssemblyContaining<UnityValidatorFactory>()
 				.ForEach(result =>
@@ -64,6 +70,11 @@ namespace HML.Immunisation.WebAPI
 					container.RegisterType(result.InterfaceType, result.ValidatorType);
 
 				});
+			container.RegisterType<Mapper, Mapper>();
+			container.RegisterType<IMapper>(new InjectionFactory(c => AutoMapperConfig.GetMapperConfiguration().CreateMapper()));
+
 		}
+
+	
 	}
 }

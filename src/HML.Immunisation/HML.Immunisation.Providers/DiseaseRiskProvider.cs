@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Threading.Tasks;
 using HML.Immunisation.Common.Interfaces;
-using HML.Immunisation.Models;
 using HML.Immunisation.Models.DbContexts;
 using HML.Immunisation.Models.Entities;
 using HML.Immunisation.Providers.Interfaces;

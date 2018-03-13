@@ -9,11 +9,11 @@ namespace HML.Immunisation.Models.Entities
     {
         public ClientSettingsRecord()
         {
-            ClientDiseaseRisks = new HashSet<ClientDiseaseRiskRecord>();
+            ClientDiseaseRisks = new List<ClientDiseaseRiskRecord>();
         }
 
         public bool IsEnabled { get; set; }
 
-        public virtual ICollection<ClientDiseaseRiskRecord> ClientDiseaseRisks { get; set; }
+        public virtual IList<ClientDiseaseRiskRecord> ClientDiseaseRisks { get; set; }
     }
 }

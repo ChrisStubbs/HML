@@ -4,9 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HML.Immunisation.Models.Entities
 {
 	[Table("Immunisation.EmployeeDiseaseRiskStatuses")]
-	public partial class EmployeeDiseaseRiskStatusRecord : BaseEntity<int> 
+	public partial class EmployeeDiseaseRiskStatusRecord : BaseEntity<int>
 	{
 		public int EmployeeId { get; set; }
+
+		public Guid ClientId { get; set; }
 
 		public int DiseaseRiskId { get; set; }
 
