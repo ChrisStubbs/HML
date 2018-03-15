@@ -53,16 +53,27 @@ namespace HML.Immunisation.WebAPI
 			// Make sure to add a Unity.Configuration to the using statements.
 			// container.LoadConfiguration();
 
-			// TODO: Register your type's mappings here.
+		
 			container.RegisterType<ILogger, NLogger>();
-			container.RegisterType<IConfiguration, Infrastructure.Configuration>();
+			container.RegisterType<IConfiguration, Configuration>();
 			container.RegisterType<IUsernameProvider, WebUsernameProvider>();
-			container.RegisterType<IDiseaseRiskProvider, DiseaseRiskProvider>();
-			container.RegisterType<IClientSettingsProvider, ClientSettingsProvider>();
 			container.RegisterType<IExceptionLogger, WebApiExceptionLogger>();
-			container.RegisterType<ILookupsProvider, LookupsProvider>();
+			container.RegisterType<ICacheService, InMemoryCache>();
+
+			container.RegisterType<IClientSettingsProvider, ClientSettingsProvider>();
+			container.RegisterType<IDiseaseRiskProvider, DiseaseRiskProvider>("DiseaseRiskProvider");
+			container.RegisterType<IDiseaseRiskProvider, CachedDiseaseRiskProvider>(
+				new InjectionConstructor(new ResolvedParameter<ICacheService>(),
+										 new ResolvedParameter<IDiseaseRiskProvider>("DiseaseRiskProvider")));
+
+			container.RegisterType<ILookupsProvider, LookupsProvider>("LookupsProvider");
+			container.RegisterType<ILookupsProvider, CachedLookupProvider>(
+				new InjectionConstructor(new ResolvedParameter<ICacheService>(),
+										 new ResolvedParameter<ILookupsProvider>("LookupsProvider")));
+
 			container.RegisterType<IEmployeeDiseaseRiskStatusProvider, EmployeeDiseaseRiskStatusProvider>();
 			container.RegisterType<IEmployeeDiseaseRiskStatusMapper, EmployeeDiseaseRiskStatusMapper>();
+
 			//register all validators
 			FluentValidation.AssemblyScanner.FindValidatorsInAssemblyContaining<UnityValidatorFactory>()
 				.ForEach(result =>
@@ -75,6 +86,6 @@ namespace HML.Immunisation.WebAPI
 
 		}
 
-	
+
 	}
 }

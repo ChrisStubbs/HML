@@ -3,6 +3,7 @@ using System.Linq;
 using FluentValidation;
 using HML.Immunisation.Models.Entities;
 using HML.Immunisation.Providers.Interfaces;
+using HML.Immunisation.WebAPI.Infrastructure;
 
 namespace HML.Immunisation.WebAPI.Validators
 {
@@ -10,9 +11,9 @@ namespace HML.Immunisation.WebAPI.Validators
 	{
 		private readonly IEmployeeDiseaseRiskStatusProvider _employeeDiseaseRiskStatusProvider;
 		private readonly IDiseaseRiskProvider _diseaseRiskProvider;
-		private IList<DiseaseRiskRecord> _diseaseRisks;
+		//private IList<DiseaseRiskRecord> _diseaseRisks;
 		private IList<EmployeeDiseaseRiskStatusRecord> _employeeDiseaseRiskStatuses;
-		private IList<DiseaseRiskRecord> DiseaseRisks => _diseaseRisks ?? (_diseaseRisks = _diseaseRiskProvider.GetAll());
+		///private IList<DiseaseRiskRecord> DiseaseRisks => _diseaseRisks ?? (_diseaseRisks = _diseaseRiskProvider.GetAll());
 
 		public EmployeeDiseaseRiskStatusRecordValidator(
 			IEmployeeDiseaseRiskStatusProvider employeeDiseaseRiskStatusProvider,
@@ -53,7 +54,7 @@ namespace HML.Immunisation.WebAPI.Validators
 
 		private string DiseaseRiskName(int diseaseRiskId)
 		{
-			return DiseaseRisks?.SingleOrDefault(x => x.Id == diseaseRiskId)?.Description;
+			return _diseaseRiskProvider.GetAll()?.SingleOrDefault(x => x.Id == diseaseRiskId)?.Description;
 		}
 
 		private bool HasRecallDateChangedToDateInThePast(EmployeeDiseaseRiskStatusRecord record)

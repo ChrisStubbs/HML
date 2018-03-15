@@ -31,9 +31,9 @@ namespace HML.Immunisation.WebAPI.Controllers
 		[Route("clients/{clientId:Guid}/employees/{employeeId:int}/disease-risk-status")]
 		public async Task<IHttpActionResult> GetEmployeeDiseaseRiskStatusesAsync(Guid clientId, int employeeId)
 		{
-			var diseaseRiskStatus = await _employeeDiseaseRiskStatusMapper.GetEmployeesDiseaseRiskStatusAsync(clientId,
-				await _employeeDiseaseRiskStatusProvider.GetEmployeesDiseaseRiskStatusAsync(employeeId));
 
+			var diseaseRiskStatus = await _employeeDiseaseRiskStatusMapper.MapEmployeesDiseaseRiskStatusAsync(clientId,
+				await _employeeDiseaseRiskStatusProvider.GetEmployeesDiseaseRiskStatusAsync(employeeId));
 			if (diseaseRiskStatus == null || !diseaseRiskStatus.Any())
 			{
 				return NotFound();
@@ -45,8 +45,23 @@ namespace HML.Immunisation.WebAPI.Controllers
 		[Route("clients/{clientId:Guid}/employees/disease-risk-status")]
 		public async Task<IHttpActionResult> GetEmployeeDiseaseRiskStatusesAsync(Guid clientId)
 		{
-			var diseaseRiskStatus = await _employeeDiseaseRiskStatusMapper.GetEmployeesDiseaseRiskStatusAsync(clientId,
-					await  _employeeDiseaseRiskStatusProvider.GetClientsEmployeesDiseaseRiskStatusAsync(clientId));
+			var diseaseRiskStatus = await _employeeDiseaseRiskStatusMapper.MapEmployeesDiseaseRiskStatusAsync(clientId,
+					await _employeeDiseaseRiskStatusProvider.GetClientsEmployeesDiseaseRiskStatusAsync(clientId));
+
+			if (diseaseRiskStatus == null || !diseaseRiskStatus.Any())
+			{
+				return NotFound();
+			}
+			return Ok(diseaseRiskStatus);
+		}
+
+		[HttpGet]
+		[Route("employees/{employeeId:int}/disease-risk-status/{diseaseRiskId:int}/history")]
+		public async Task<IHttpActionResult> GetEmployeeDiseaseRiskStatuseHistoryAsync(int employeeId, int diseaseRiskId)
+		{
+
+			var diseaseRiskStatus = await _employeeDiseaseRiskStatusMapper.MapEmployeesDiseaseRiskStatusWithNoClientSettingsAsync(
+					await _employeeDiseaseRiskStatusProvider.GetEmployeesDiseaseRiskStatusHistoryAsync(employeeId, diseaseRiskId));
 
 			if (diseaseRiskStatus == null || !diseaseRiskStatus.Any())
 			{
@@ -67,7 +82,7 @@ namespace HML.Immunisation.WebAPI.Controllers
 						_employeeDiseaseRiskStatusMapper.MapEmployeesDiseaseRiskStatusAsync(
 							await _employeeDiseaseRiskStatusProvider.SaveAsync(employeeId, diseaseRiskStatusRecords)
 							);
-					
+
 					if (updated != null)
 					{
 						return Ok(updated);
@@ -76,7 +91,8 @@ namespace HML.Immunisation.WebAPI.Controllers
 					return NotFound();
 				}
 
-				return BadRequest(ModelState);
+
+                return BadRequest(ModelState);
 			}
 			catch (Exception e)
 			{
@@ -84,5 +100,24 @@ namespace HML.Immunisation.WebAPI.Controllers
 				return InternalServerError(e);
 			}
 		}
-	}
+        [HttpPut]
+        [Route("employees/{employeeId:int}/validate")]
+        public async Task<IHttpActionResult> ValidateAsync(int employeeId,IList<EmployeeDiseaseRiskStatusRecord> diseaseRiskStatusRecords)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                        return Ok();
+
+                }
+                return BadRequest(ModelState);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Error when validating Disease Risk Status.", e);
+                return InternalServerError(e);
+            }
+        }
+    }
 }

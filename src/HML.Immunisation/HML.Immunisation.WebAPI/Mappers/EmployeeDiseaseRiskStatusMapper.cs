@@ -30,10 +30,10 @@ namespace HML.Immunisation.WebAPI.Mappers
 			_mapper = mapper;
 		}
 
-		public async Task<IList<EmployeeDiseaseRiskStatus>> GetEmployeesDiseaseRiskStatusAsync(Guid clientId,
+		public async Task<IList<EmployeeDiseaseRiskStatus>> MapEmployeesDiseaseRiskStatusAsync(Guid clientId,
 			IList<EmployeeDiseaseRiskStatusRecord> employeeDiseaseRiskStatusRiskStatusRecords)
 		{
-			
+
 			var clientDiseaseRiskTask = _clientSettingsProvider.GetByClientIdAsync(clientId);
 			var diseaseRisksTask = _diseaseRiskProvider.GetAllAsync();
 			var lookupTask = _lookupsProvider.GetAsync();
@@ -47,17 +47,43 @@ namespace HML.Immunisation.WebAPI.Mappers
 				employeeDiseaseRiskStatusRiskStatusRecords);
 		}
 
+		public async Task<IList<EmployeeDiseaseRiskStatus>> MapEmployeesDiseaseRiskStatusWithNoClientSettingsAsync(
+			IList<EmployeeDiseaseRiskStatusRecord> employeeDiseaseRiskStatusRiskStatusRecords)
+		{
+			var diseaseRisksTask = _diseaseRiskProvider.GetAllAsync();
+			var lookupTask = _lookupsProvider.GetAsync();
+			await Task.WhenAll(diseaseRisksTask, lookupTask).ConfigureAwait(false);
+
+			return GetEmployeeDiseaseRiskStatusesWithNoClientSettings(
+				diseaseRisksTask.Result,
+				lookupTask.Result,
+				_mapper,
+				employeeDiseaseRiskStatusRiskStatusRecords);
+		}
+
 		public async Task<IList<EmployeeDiseaseRiskStatus>> MapEmployeesDiseaseRiskStatusAsync(
 			IList<EmployeeDiseaseRiskStatusRecord> employeeDiseaseRiskStatusRiskStatusRecords)
 		{
 			var empDiseaseRisk = employeeDiseaseRiskStatusRiskStatusRecords.FirstOrDefault();
 			if (empDiseaseRisk != null)
 			{
-				return await GetEmployeesDiseaseRiskStatusAsync(empDiseaseRisk.ClientId, employeeDiseaseRiskStatusRiskStatusRecords);
+				return await MapEmployeesDiseaseRiskStatusAsync(empDiseaseRisk.ClientId, employeeDiseaseRiskStatusRiskStatusRecords);
 			}
 			return new List<EmployeeDiseaseRiskStatus>();
 		}
-		
+
+		public static IList<EmployeeDiseaseRiskStatus> GetEmployeeDiseaseRiskStatusesWithNoClientSettings(
+			IList<DiseaseRiskRecord> diseaseRisk,
+			Lookups lookups,
+			IMapper mapper,
+			IList<EmployeeDiseaseRiskStatusRecord> employeeDiseaseRiskStatusRiskStatusRecords)
+		{
+			var mergedStatuses = mapper.Map<IList<EmployeeDiseaseRiskStatus>>(employeeDiseaseRiskStatusRiskStatusRecords).ToList();
+			AddLookupDescriptions(diseaseRisk, lookups, mergedStatuses);
+
+			return mergedStatuses.OrderBy(x => x.CreateDate).ToList();
+		}
+
 		public static IList<EmployeeDiseaseRiskStatus> GetEmployeeDiseaseRiskStatuses(
 			 ClientSettingsRecord clientSettingsRecord,
 			 IList<DiseaseRiskRecord> diseaseRisk,
@@ -66,12 +92,11 @@ namespace HML.Immunisation.WebAPI.Mappers
 			 IList<EmployeeDiseaseRiskStatusRecord> employeeDiseaseRiskStatusRiskStatusRecords)
 		{
 
-
 			var currentClientDiseaseRiskIds = clientSettingsRecord.ClientDiseaseRisks.Where(x => !x.IsDeleted).Select(x => x.DiseaseRiskId);
 
 			var mergedStatuses = mapper.Map<IList<EmployeeDiseaseRiskStatus>>(
-										employeeDiseaseRiskStatusRiskStatusRecords.Where(x => !x.IsDeleted
-										 && (x.IsRequired || currentClientDiseaseRiskIds.Contains(x.DiseaseRiskId))
+										employeeDiseaseRiskStatusRiskStatusRecords.Where(x =>
+											x.IsRequired || currentClientDiseaseRiskIds.Contains(x.DiseaseRiskId)
 										 )).ToList();
 
 
@@ -79,27 +104,30 @@ namespace HML.Immunisation.WebAPI.Mappers
 			{
 				if (mergedStatuses.All(x => x.DiseaseRiskId != clientDiseaseRiskId))
 				{
-					mergedStatuses.Add(new EmployeeDiseaseRiskStatus { DiseaseRiskId = clientDiseaseRiskId,ClientId  = clientSettingsRecord.Id });
+					mergedStatuses.Add(new EmployeeDiseaseRiskStatus { DiseaseRiskId = clientDiseaseRiskId, ClientId = clientSettingsRecord.Id });
 				}
 			}
 
+			AddLookupDescriptions(diseaseRisk, lookups, mergedStatuses);
+
+			return mergedStatuses.OrderBy(x => x.EmployeeId).ThenBy(x => x.DiseaseRiskCode).ToList();
+		}
+
+		private static void AddLookupDescriptions(IList<DiseaseRiskRecord> diseaseRisk, Lookups lookups, List<EmployeeDiseaseRiskStatus> mergedStatuses)
+		{
 			mergedStatuses.ForEach(x =>
 			{
 				var risk = diseaseRisk.FirstOrDefault(dr => dr.Id == x.DiseaseRiskId);
 				x.DiseaseRiskDescription = risk?.Description;
 				x.DiseaseRiskCode = risk?.Code;
 
-				x.RecallActionDisplayValue = lookups.RecallActions.FirstOrDefault(a => a.Key == x.RecallActionId)?.DisplayValue ?? string.Empty;
+				x.RecallActionDisplayValue = lookups.RecallActions.FirstOrDefault(a => a.Key == x.RecallActionId)?.DisplayValue ??
+											 string.Empty;
 				x.CurrentProgressDisplayValue =
-					lookups.ImmunisationProgress.FirstOrDefault(a => a.Key == x.CurrentProgress).DisplayValue() ;
+					lookups.ImmunisationProgress.FirstOrDefault(a => a.Key == x.CurrentProgress).DisplayValue();
 				x.ImmunisationStatusDisplayValue =
 					lookups.ImmunisationStatuses.FirstOrDefault(a => a.Key == x.ImmunisationStatusId).DisplayValue();
 			});
-
-			return mergedStatuses.OrderBy(x=> x.DiseaseRiskCode).ToList();
 		}
-
-
-
 	}
 }

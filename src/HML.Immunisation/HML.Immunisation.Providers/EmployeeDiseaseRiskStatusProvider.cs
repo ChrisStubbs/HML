@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using HML.Immunisation.Common.Interfaces;
 using HML.Immunisation.Models.DbContexts;
 using HML.Immunisation.Models.Entities;
 using HML.Immunisation.Models.Helpers;
 using HML.Immunisation.Providers.Interfaces;
+using LinqKit;
 
 namespace HML.Immunisation.Providers
 {
+
 	public class EmployeeDiseaseRiskStatusProvider : IEmployeeDiseaseRiskStatusProvider
 	{
 		private readonly IConfiguration _configuration;
@@ -33,40 +36,12 @@ namespace HML.Immunisation.Providers
 
 		public async Task<IList<EmployeeDiseaseRiskStatusRecord>> GetEmployeesDiseaseRiskStatusAsync(int employeeId)
 		{
-			try
-			{
-				using (var db = GetDbContext())
-				{
-					return await db.EmployeeDiseaseRiskStatuses
-						.Where(x => x.EmployeeId == employeeId)
-						.ToListAsync()
-						.ConfigureAwait(false);
-				}
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError($"Failed to get Disease Risks", ex);
-				throw;
-			}
+			return await Search(ByEmployeeNotDeleted(employeeId));
 		}
 
 		public async Task<IList<EmployeeDiseaseRiskStatusRecord>> GetClientsEmployeesDiseaseRiskStatusAsync(Guid clientId)
 		{
-			try
-			{
-				using (var db = GetDbContext())
-				{
-					return await db.EmployeeDiseaseRiskStatuses
-						.Where(x => x.ClientId == clientId)
-						.ToListAsync()
-						.ConfigureAwait(false);
-				}
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError($"Failed to get Disease Risks", ex);
-				throw;
-			}
+			return await Search(ByClientNotDeleted(clientId));
 		}
 
 		public IList<EmployeeDiseaseRiskStatusRecord> GetEmployeesDiseaseRiskStatus(int employeeId)
@@ -74,7 +49,8 @@ namespace HML.Immunisation.Providers
 			return Task.Run(() => GetEmployeesDiseaseRiskStatusAsync(employeeId)).Result;
 		}
 
-		public async Task<IList<EmployeeDiseaseRiskStatusRecord>> SaveAsync(int employeeId, IList<EmployeeDiseaseRiskStatusRecord> statuses)
+		public async Task<IList<EmployeeDiseaseRiskStatusRecord>> SaveAsync(int employeeId,
+			IList<EmployeeDiseaseRiskStatusRecord> statuses)
 		{
 			try
 			{
@@ -83,7 +59,8 @@ namespace HML.Immunisation.Providers
 					var existingDiseaseRisks = await GetEmployeesDiseaseRiskStatusAsync(employeeId);
 
 					// delete items that are not in the payload
-					foreach (var itemToDelete in existingDiseaseRisks.Where(x => !x.IsDeleted && !statuses.Select(y => y?.Id).Contains(x.Id)))
+					foreach (
+						var itemToDelete in existingDiseaseRisks.Where(x => !x.IsDeleted && !statuses.Select(y => y?.Id).Contains(x.Id)))
 					{
 						var existingItem = await db.EmployeeDiseaseRiskStatuses.FindAsync(itemToDelete.Id);
 						db.Entry(existingItem).Entity.IsDeleted = true;
@@ -115,7 +92,7 @@ namespace HML.Immunisation.Providers
 					}
 
 					await db.SaveChangesAsync().ConfigureAwait(false);
-					return await GetEmployeesDiseaseRiskStatusAsync(employeeId); 
+					return await GetEmployeesDiseaseRiskStatusAsync(employeeId);
 				}
 			}
 			catch (Exception ex)
@@ -124,5 +101,64 @@ namespace HML.Immunisation.Providers
 				throw;
 			}
 		}
+
+		public async Task<IList<EmployeeDiseaseRiskStatusRecord>> GetEmployeesDiseaseRiskStatusHistoryAsync(int employeeId,
+			int diseaseRiskId)
+		{
+			return await Search(ByEmployeeDiseaseRiskWithDeleted(employeeId, diseaseRiskId));
+		}
+
+		public int NoOfEmployeesWithDiseaseRiskRequiredForRole(int diseaseriskId)
+		{
+			try
+			{
+				using (var db = GetDbContext())
+				{
+					return db.EmployeeDiseaseRiskStatuses.Count(x => x.IsRequired == true && x.DiseaseRiskId == diseaseriskId);
+				}
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"Failed search NoOfEmployeesWithDiseaseRiskRequiredForRole", ex);
+				throw;
+			}
+		}
+
+		private async Task<IList<EmployeeDiseaseRiskStatusRecord>> Search(Expression<Func<EmployeeDiseaseRiskStatusRecord, bool>> filterExpression)
+		{
+			try
+			{
+				using (var db = GetDbContext())
+				{
+					return await db.EmployeeDiseaseRiskStatuses
+						.AsExpandable()
+						.Where(filterExpression)
+						.ToListAsync()
+						.ConfigureAwait(false);
+				}
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"Failed search EmployeeDiseaseRiskStatusRecord", ex);
+				throw;
+			}
+		}
+
+		private static Expression<Func<EmployeeDiseaseRiskStatusRecord, bool>> ByClientNotDeleted(Guid clientId)
+		{
+			return e => e.ClientId == clientId && !e.IsDeleted;
+		}
+
+		private static Expression<Func<EmployeeDiseaseRiskStatusRecord, bool>> ByEmployeeNotDeleted(int employeeId)
+		{
+			return e => e.EmployeeId == employeeId && !e.IsDeleted;
+		}
+
+		public Expression<Func<EmployeeDiseaseRiskStatusRecord, bool>> ByEmployeeDiseaseRiskWithDeleted(int employeeId, int diseaseRiskId)
+		{
+			return e => e.EmployeeId == employeeId && e.DiseaseRiskId == diseaseRiskId;
+		}
+
 	}
 }

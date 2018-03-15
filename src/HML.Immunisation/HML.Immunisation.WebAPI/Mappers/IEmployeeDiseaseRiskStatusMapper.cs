@@ -8,10 +8,13 @@ namespace HML.Immunisation.WebAPI.Mappers
 {
 	public interface IEmployeeDiseaseRiskStatusMapper
 	{
-		Task<IList<EmployeeDiseaseRiskStatus>> GetEmployeesDiseaseRiskStatusAsync(Guid clientId, 
+		Task<IList<EmployeeDiseaseRiskStatus>> MapEmployeesDiseaseRiskStatusAsync(Guid clientId, 
 			IList<EmployeeDiseaseRiskStatusRecord> employeeDiseaseRiskStatusRiskStatusRecords);
 
 		Task<IList<EmployeeDiseaseRiskStatus>> MapEmployeesDiseaseRiskStatusAsync(
+			IList<EmployeeDiseaseRiskStatusRecord> employeeDiseaseRiskStatusRiskStatusRecords);
+
+		Task<IList<EmployeeDiseaseRiskStatus>> MapEmployeesDiseaseRiskStatusWithNoClientSettingsAsync(
 			IList<EmployeeDiseaseRiskStatusRecord> employeeDiseaseRiskStatusRiskStatusRecords);
 	}
 }
