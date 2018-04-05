@@ -30,6 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Factories\EmployeeRecordFactory.cs" />
+    <Compile Include="Factories\EntityFactory.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Models\AddressRecordTests.cs" />
     <Compile Include="Models\AddressRecordValidatorTests.cs" />
@@ -38,6 +40,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\EmployeeProviderTests.cs" />
     <Compile Include="WebApi\UnityContainerTests.cs" />
+    <Compile Include="WebApi\Validators\ImportValidatorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

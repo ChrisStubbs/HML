@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using FluentValidation;
 using HML.Immunisation.Models.Entities;
 using HML.Immunisation.Providers.Interfaces;
@@ -9,14 +8,11 @@ namespace HML.Immunisation.WebAPI.Validators
 {
 	public class EmployeeDiseaseRiskStatusRecordValidator : AbstractValidator<EmployeeDiseaseRiskStatusRecord>
 	{
-		private readonly IEmployeeDiseaseRiskStatusProvider _employeeDiseaseRiskStatusProvider;
+		private readonly ICachedEmployeeDiseaseRiskStatusProvider _employeeDiseaseRiskStatusProvider;
 		private readonly IDiseaseRiskProvider _diseaseRiskProvider;
-		//private IList<DiseaseRiskRecord> _diseaseRisks;
-		private IList<EmployeeDiseaseRiskStatusRecord> _employeeDiseaseRiskStatuses;
-		///private IList<DiseaseRiskRecord> DiseaseRisks => _diseaseRisks ?? (_diseaseRisks = _diseaseRiskProvider.GetAll());
-
+		
 		public EmployeeDiseaseRiskStatusRecordValidator(
-			IEmployeeDiseaseRiskStatusProvider employeeDiseaseRiskStatusProvider,
+			ICachedEmployeeDiseaseRiskStatusProvider employeeDiseaseRiskStatusProvider,
 			IDiseaseRiskProvider diseaseRiskProvider)
 		{
 			_employeeDiseaseRiskStatusProvider = employeeDiseaseRiskStatusProvider;
@@ -45,11 +41,7 @@ namespace HML.Immunisation.WebAPI.Validators
 
 		private EmployeeDiseaseRiskStatusRecord GetEmployeeDiseaseRiskStatusRecord(int employeeId, int id)
 		{
-			if (_employeeDiseaseRiskStatuses == null)
-			{
-				_employeeDiseaseRiskStatuses = _employeeDiseaseRiskStatusProvider.GetEmployeesDiseaseRiskStatus(employeeId);
-			}
-			return _employeeDiseaseRiskStatuses?.SingleOrDefault(x => x.Id == id);
+			return _employeeDiseaseRiskStatusProvider.GetEmployeesDiseaseRiskStatus(employeeId)?.SingleOrDefault(x => x.Id == id);
 		}
 
 		private string DiseaseRiskName(int diseaseRiskId)

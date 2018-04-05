@@ -1,15 +1,10 @@
 using System;
-using System.Linq;
-using System.Web.Http;
 using System.Web.Http.ExceptionHandling;
 using AutoMapper;
-using FluentValidation;
 using HML.Immunisation.Common;
 using HML.Immunisation.Common.Interfaces;
-using HML.Immunisation.Models.Entities;
 using HML.Immunisation.Providers;
 using HML.Immunisation.Providers.Interfaces;
-using HML.Immunisation.WebAPI.Controllers;
 using HML.Immunisation.WebAPI.Infrastructure;
 using HML.Immunisation.WebAPI.Mappers;
 using Unity;
@@ -66,7 +61,9 @@ namespace HML.Immunisation.WebAPI
 				new InjectionConstructor(new ResolvedParameter<ICacheService>(),
 										 new ResolvedParameter<IDiseaseRiskProvider>("DiseaseRiskProvider")));
 
-			container.RegisterType<ILookupsProvider, LookupsProvider>("LookupsProvider");
+            container.RegisterType<IImmunisationStatusProvider, ImmunisationStatusProvider>();
+
+            container.RegisterType<ILookupsProvider, LookupsProvider>("LookupsProvider");
 			container.RegisterType<ILookupsProvider, CachedLookupProvider>(
 				new InjectionConstructor(new ResolvedParameter<ICacheService>(),
 										 new ResolvedParameter<ILookupsProvider>("LookupsProvider")));
@@ -82,7 +79,12 @@ namespace HML.Immunisation.WebAPI
 
 				});
 			container.RegisterType<Mapper, Mapper>();
+
+			container.RegisterType<ICacheService, HttpRequestCache>("HttpRequestCache");
 			container.RegisterType<IMapper>(new InjectionFactory(c => AutoMapperConfig.GetMapperConfiguration().CreateMapper()));
+			container.RegisterType<ICachedEmployeeDiseaseRiskStatusProvider,CachedEmployeeDiseaseRiskStatusProvider>(
+				new InjectionConstructor(new ResolvedParameter<ICacheService>("HttpRequestCache"),
+										new ResolvedParameter<IEmployeeDiseaseRiskStatusProvider>()));
 
 		}
 

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Web.Hosting;
 using System.Web.Http;
@@ -11,7 +12,6 @@ namespace HML.Immunisation.WebAPI.Controllers
 	    private static readonly string Name = Assembly.GetExecutingAssembly().GetName().ToString();
 		public IHttpActionResult Get()
 	    {
-		
 			var deploymentDate = File.GetLastWriteTime(Path.Combine(HostingEnvironment.MapPath("~"), "web.config"));
 			string version = $"{Name} {Version} ({deploymentDate.ToShortDateString()})";
 

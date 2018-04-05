@@ -12,7 +12,6 @@ namespace HML.Employee.WebAPI.Controllers
 	    private static readonly string Name = Assembly.GetExecutingAssembly().GetName().ToString();
 		public IHttpActionResult Get()
 	    {
-		
 			var deploymentDate = File.GetLastWriteTime(Path.Combine(HostingEnvironment.MapPath("~"), "web.config"));
 			string version = $"{Name} {Version} ({deploymentDate.ToShortDateString()})";
 		    return Ok(version);

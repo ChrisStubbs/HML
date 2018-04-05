@@ -35,7 +35,7 @@ namespace HML.Employee.WebAPI.Controllers
 
 		[HttpGet]
 		[Route("employees")]
-		public async Task<IHttpActionResult> SearchAsync(Guid caseEmployeeId)
+		public async Task<IHttpActionResult> GetByCaseEmployeeIdAsync(Guid caseEmployeeId)
 		{
 			var employee = await _employeeProvider.GetByCaseEmployeeId(caseEmployeeId).ConfigureAwait(false);
 			if (employee == null)

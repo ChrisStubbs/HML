@@ -8,7 +8,11 @@ namespace HML.Immunisation.Models.Entities
 	[Table("Immunisation.ImmunisationStatuses")]
     public partial class ImmunisationStatusRecord  : BaseEntity<short>
 	{
-		[Required]
+        public ImmunisationStatusRecord()
+        {
+        }
+
+        [Required]
         [StringLength(50)]
         public string Description { get; set; }
 		public static short Protected => 1;

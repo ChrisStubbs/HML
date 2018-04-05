@@ -27,6 +27,7 @@ namespace HML.Employee.WebAPI
 
 			config.Services.Add(typeof(IExceptionLogger), UnityConfig.Container.Resolve<IExceptionLogger>());
 			FluentValidationModelValidatorProvider.Configure(config, x => x.ValidatorFactory = new UnityValidatorFactory(config));
+			
 		}
     }
 }

@@ -91,26 +91,36 @@ namespace HML.Immunisation.WebAPI.Mappers
 			 IMapper mapper,
 			 IList<EmployeeDiseaseRiskStatusRecord> employeeDiseaseRiskStatusRiskStatusRecords)
 		{
-
-			var currentClientDiseaseRiskIds = clientSettingsRecord.ClientDiseaseRisks.Where(x => !x.IsDeleted).Select(x => x.DiseaseRiskId);
-
-			var mergedStatuses = mapper.Map<IList<EmployeeDiseaseRiskStatus>>(
-										employeeDiseaseRiskStatusRiskStatusRecords.Where(x =>
-											x.IsRequired || currentClientDiseaseRiskIds.Contains(x.DiseaseRiskId)
-										 )).ToList();
-
-
-			foreach (var clientDiseaseRiskId in currentClientDiseaseRiskIds)
+			if (clientSettingsRecord != null)
 			{
-				if (mergedStatuses.All(x => x.DiseaseRiskId != clientDiseaseRiskId))
+
+				var currentClientDiseaseRiskIds =
+					clientSettingsRecord.ClientDiseaseRisks.Where(x => !x.IsDeleted).Select(x => x.DiseaseRiskId);
+
+				var mergedStatuses = mapper.Map<IList<EmployeeDiseaseRiskStatus>>(
+					employeeDiseaseRiskStatusRiskStatusRecords.Where(x =>
+								x.IsRequired || currentClientDiseaseRiskIds.Contains(x.DiseaseRiskId)
+					)).ToList();
+
+
+				foreach (var clientDiseaseRiskId in currentClientDiseaseRiskIds)
 				{
-					mergedStatuses.Add(new EmployeeDiseaseRiskStatus { DiseaseRiskId = clientDiseaseRiskId, ClientId = clientSettingsRecord.Id });
+					if (mergedStatuses.All(x => x.DiseaseRiskId != clientDiseaseRiskId))
+					{
+						mergedStatuses.Add(new EmployeeDiseaseRiskStatus
+						{
+							DiseaseRiskId = clientDiseaseRiskId,
+							ClientId = clientSettingsRecord.Id
+						});
+					}
 				}
+
+				AddLookupDescriptions(diseaseRisk, lookups, mergedStatuses);
+
+				return mergedStatuses.OrderBy(x => x.EmployeeId).ThenBy(x => x.DiseaseRiskCode).ToList();
 			}
 
-			AddLookupDescriptions(diseaseRisk, lookups, mergedStatuses);
-
-			return mergedStatuses.OrderBy(x => x.EmployeeId).ThenBy(x => x.DiseaseRiskCode).ToList();
+			return new List<EmployeeDiseaseRiskStatus>();
 		}
 
 		private static void AddLookupDescriptions(IList<DiseaseRiskRecord> diseaseRisk, Lookups lookups, List<EmployeeDiseaseRiskStatus> mergedStatuses)

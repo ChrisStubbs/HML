@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using HML.Employee.Common.Interfaces;
 using HML.Employee.Models;
 using HML.Employee.Models.Entities;
+using HML.Employee.Models.ViewModels;
 using HML.Employee.Providers.Interfaces;
 using LinqKit;
 
@@ -41,6 +42,7 @@ namespace HML.Employee.Providers
 						.Include(x => x.Addresses)
 						.Include(x => x.Contacts)
 						.Include(x => x.ClientSpecificFields)
+						.Include(x => x.Notes)
 						.AsExpandable()
 						.Where(filterExpression)
 						.ToListAsync()
@@ -65,6 +67,7 @@ namespace HML.Employee.Providers
 						.Include(x => x.Addresses)
 						.Include(x => x.Contacts)
 						.Include(x => x.ClientSpecificFields)
+						.Include(x => x.Notes)
 						.AsExpandable()
 						.Where(filterExpression)
 						.ToListAsync()
@@ -84,14 +87,59 @@ namespace HML.Employee.Providers
 			return await Search(ByClient(clientId));
 		}
 
-		public async Task<IList<EmployeeRecord>> GetByCaseEmployeeId(Guid caseEmployeeId)
+		public async Task<EmployeeRecord> GetByCaseEmployeeId(Guid caseEmployeeId)
 		{
-			return await Search(ByCaseEmployeeId(caseEmployeeId));
+			var results = await Search(ByCaseEmployeeId(caseEmployeeId));
+			return results.SingleOrDefault();
 		}
 
 		public async Task<IList<EmployeeRecord>> GetByCaseEmployeeByNameOrClientIdOrDob(Guid clientId, string firstName, string lastName, DateTime dob)
 		{
 			return await SearchLinkedCases(ByEmployeeByNameOrClientIdOrDob(clientId, firstName, lastName, dob));
+		}
+
+		public bool IsEmployeeIdIsUniqueForClient(EmployeeRecord employee)
+		{
+			try
+			{
+				if (string.IsNullOrWhiteSpace(employee.EmployeeId)) return true;
+				using (var db = GetDbContext())
+				{
+					return db.Employees.Count(x => x.IsDeleted == false
+												   && x.ClientId.Equals(employee.ClientId)
+												   && x.EmployeeId.Equals(employee.EmployeeId, StringComparison.InvariantCultureIgnoreCase)
+												   && x.Id != employee.Id) == 0;
+				}
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"Failed search NoOfEmployeesWithDiseaseRiskRequiredForRole", ex);
+				throw;
+			}
+		}
+
+		public IList<IEmployeeImportMatchCriteria> GetEmployeesImportMatchCriteriaByClient(Guid clientId)
+		{
+			try
+			{
+				List<EmployeeImportMatchCriteria> results;
+				using (var db = GetDbContext())
+				{
+					results = db.Employees.Where(x => x.ClientId == clientId).Select(emp => new EmployeeImportMatchCriteria
+					{
+						DateOfBirth = emp.DateOfBirth,
+						LastName = emp.LastName,
+						ClientId = emp.ClientId
+					}).ToList();
+				}
+
+				return results.OfType<IEmployeeImportMatchCriteria>().ToList();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"Failed GetEmployeesImportMatchCriteriaByClient", ex);
+				throw;
+			}
 		}
 
 		public async Task<EmployeeRecord> GetByIdAsync(int id)
@@ -104,6 +152,7 @@ namespace HML.Employee.Providers
 						.Include(x => x.Addresses)
 						.Include(x => x.Contacts)
 						.Include(x => x.ClientSpecificFields)
+						.Include(x => x.Notes)
 						.SingleOrDefaultAsync(x => x.Id == id)
 						.ConfigureAwait(false);
 				}
@@ -154,7 +203,7 @@ namespace HML.Employee.Providers
 					InsertUpdateChildren(db, existing, employee.ClientSpecificFields, existing.ClientSpecificFields);
 
 					await db.SaveChangesAsync().ConfigureAwait(false);
-					return existing;
+					return await GetByIdAsync(existing.Id);
 				}
 			}
 			catch (Exception ex)

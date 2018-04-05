@@ -1,0 +1,7 @@
+﻿<#
+	sqlDatabaseName	= "dbHMDev_TEST03";
+    sqlServerName = "HMLSQLDEV01";
+	sqlServerUsername = "webuser";
+	sqlServerPassword = "#WishTower";
+#>
+<#@ include file="Web.TEMPLATE.tt" #>

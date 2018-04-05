@@ -54,9 +54,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientSpecificFieldConfigProvider.cs" />
+    <Compile Include="EmployeeImportProvider.cs" />
     <Compile Include="EmployeeProvider.cs" />
+    <Compile Include="IEmployeeImportProvider.cs" />
     <Compile Include="Interfaces\IClientSpecificFieldConfigProvider.cs" />
     <Compile Include="Interfaces\IEmployeeProvider.cs" />
+    <Compile Include="Interfaces\INoteProvider.cs" />
+    <Compile Include="NoteProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

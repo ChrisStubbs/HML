@@ -1,0 +1,7 @@
+﻿<#
+	sqlDatabaseName	= "HMLDatabase";
+    sqlServerName = "PC4796\\SQLEXPRESS";
+	sqlServerUsername = "webuser";
+	sqlServerPassword = "#WishTower";
+#>
+<#@ include file="Web.TEMPLATE.tt" #>

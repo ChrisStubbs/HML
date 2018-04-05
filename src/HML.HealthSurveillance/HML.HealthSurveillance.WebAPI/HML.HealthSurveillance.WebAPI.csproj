@@ -143,8 +143,13 @@
     <Content Include="Global.asax" />
     <Content Include="scripts\ai.0.22.9-build00167.js" />
     <Content Include="scripts\ai.0.22.9-build00167.min.js" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
+    <Content Include="Web.TEMPLATE.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Web.TEMPLATE.config</LastGenOutput>
+    </Content>
+    <Content Include="Web.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Web.config</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -167,11 +172,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Service References\Application Insights\ConnectedService.json" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
+    <Content Include="Nlog.config" />
+    <Content Include="Web.config">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Web.tt</DependentUpon>
+    </Content>
+    <None Include="Web.TEMPLATE.config">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Web.TEMPLATE.tt</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -194,6 +204,9 @@
       <Project>{88dba827-0003-4e7a-bb90-2c1bc273047b}</Project>
       <Name>HML.HealthSurveillance.Providers</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

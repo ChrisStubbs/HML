@@ -6,12 +6,12 @@ using FluentValidation;
 using HML.Immunisation.WebAPI.Infrastructure;
 
 namespace HML.Immunisation.WebAPI.Validators
-{	
+{
 	public class ClientDiseaseRiskRecordValidator : AbstractValidator<ClientDiseaseRiskRecord>
 	{
 		private readonly IEmployeeDiseaseRiskStatusProvider _employeeDiseaseRiskStatusProvider;
 		private readonly IDiseaseRiskProvider _diseaseRiskProvider;
-		
+
 
 		public ClientDiseaseRiskRecordValidator(
 			IEmployeeDiseaseRiskStatusProvider employeeDiseaseRiskStatusProvider,
@@ -33,7 +33,7 @@ namespace HML.Immunisation.WebAPI.Validators
 		{
 			if (record.IsDeleted)
 			{
-				return _employeeDiseaseRiskStatusProvider.NoOfEmployeesWithDiseaseRiskRequiredForRole(record.DiseaseRiskId) > 0;
+				return _employeeDiseaseRiskStatusProvider.NoOfEmployeesWithDiseaseRiskRequiredForRole(record.ClientId, record.DiseaseRiskId) > 0;
 			}
 			return false;
 		}

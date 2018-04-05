@@ -13,8 +13,8 @@ namespace HML.Immunisation.Providers.Interfaces
 		Task<IList<EmployeeDiseaseRiskStatusRecord>> GetClientsEmployeesDiseaseRiskStatusAsync(Guid clientId);
 		IList<EmployeeDiseaseRiskStatusRecord> GetEmployeesDiseaseRiskStatus(int employeeId);
 		Task<IList<EmployeeDiseaseRiskStatusRecord>> SaveAsync(int employeeId, IList<EmployeeDiseaseRiskStatusRecord> statuses);
-		Task<IList<EmployeeDiseaseRiskStatusRecord>> GetEmployeesDiseaseRiskStatusHistoryAsync(int employeeId,int diseaseRiskId);
-		int NoOfEmployeesWithDiseaseRiskRequiredForRole(int diseaseriskId);
+		Task<IList<EmployeeDiseaseRiskStatusRecord>> GetEmployeesDiseaseRiskStatusHistoryAsync(int employeeId, int diseaseRiskId);
+		int NoOfEmployeesWithDiseaseRiskRequiredForRole(Guid clientId, int diseaseriskId);
 
 	}
 }

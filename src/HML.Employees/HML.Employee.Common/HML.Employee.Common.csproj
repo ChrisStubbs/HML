@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DateFormatExtensions.cs" />
+    <Compile Include="Interfaces\CacheKeys.cs" />
+    <Compile Include="Interfaces\ICacheService.cs" />
     <Compile Include="Interfaces\IConfiguration.cs" />
     <Compile Include="Interfaces\ILogger.cs" />
     <Compile Include="Interfaces\IUsernameProvider.cs" />

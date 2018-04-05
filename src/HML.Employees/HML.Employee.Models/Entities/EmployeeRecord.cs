@@ -1,23 +1,22 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 using HML.Employee.Common;
+using HML.Employee.Models.ViewModels;
+using Newtonsoft.Json;
 
 namespace HML.Employee.Models.Entities
 {
 	[Table("employee.Employees")]
-	public partial class EmployeeRecord : BaseEntity
+	public partial class EmployeeRecord : BaseEntity , IEmployeeImportMatchCriteria
 	{
-		private const string DateFormat = "{0:dd MMM yyyy}";
-
 		public EmployeeRecord()
 		{
 			Addresses = new HashSet<AddressRecord>();
 			ClientSpecificFields = new HashSet<ClientSpecificFieldRecord>();
 			Contacts = new HashSet<ContactRecord>();
-			//Notes = new HashSet<NoteRecord>();
+	    	Notes = new HashSet<NoteRecord>();
 		}
 
 		public Guid ClientId { get; set; }
@@ -38,16 +37,12 @@ namespace HML.Employee.Models.Entities
 
 		public string LastName { get; set; }
 
-		[Column(TypeName = "date")]
-		public DateTime? DateOfBirth { get; set; }
-
-		[StringLength(100)]
+		public DateTime DateOfBirth { get; set; }
+		
 		public string JobTitle { get; set; }
 
-		[Column(TypeName = "date")]
 		public DateTime? StartDate { get; set; }
 
-		[Column(TypeName = "date")]
 		public DateTime? EndDate { get; set; }
 
 		public string NationalInsuranceNumber { get; set; }
@@ -58,19 +53,21 @@ namespace HML.Employee.Models.Entities
 
 		public bool IsNightWorker { get; set; }
 
-		[Column(TypeName = "numeric")]
 		public decimal? NoOfHoursWorked { get; set; }
 
 		public bool IsActive { get; set; }
+		public int? ImportId { get; set; }
 
 		public virtual ICollection<AddressRecord> Addresses { get; set; }
 
 		public virtual ICollection<ContactRecord> Contacts { get; set; }
 
-		//public virtual ICollection<NoteRecord> Notes { get; set; }
+		public virtual ICollection<NoteRecord> Notes { get; set; }
 
 		public virtual ICollection<ClientSpecificFieldRecord> ClientSpecificFields { get; set; }
 
+		[JsonIgnore]
+		public virtual ImportRecord Import { get; set; }
 		public virtual bool IsEndDateGreaterThanStartDate()
 		{
 			if (EndDate.HasValue)
@@ -126,6 +123,11 @@ namespace HML.Employee.Models.Entities
 			{
 				return IsActive;
 			}
+		}
+
+		public bool IsDateOfBirthInTheFuture()
+		{
+			return DateOfBirth > DateTime.Today ;
 		}
 
 	}

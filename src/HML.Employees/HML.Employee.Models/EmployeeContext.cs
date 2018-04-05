@@ -14,9 +14,9 @@ namespace HML.Employee.Models
 		public virtual DbSet<AddressRecord> Addresses { get; set; }
 		public virtual DbSet<ContactRecord> Contacts { get; set; }
 		public virtual DbSet<EmployeeRecord> Employees { get; set; }
-              
         public virtual DbSet<NoteRecord> Notes { get; set; }
 		public virtual DbSet<ClientSpecificFieldRecord> ClientSpecificFields { get; set; }
+		public virtual DbSet<ImportRecord> Imports { get; set; }
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
@@ -103,18 +103,46 @@ namespace HML.Employee.Models
 				.WithRequired(e => e.Employee)
 				.WillCascadeOnDelete(false);
 
-			modelBuilder.Entity<NoteRecord>()
-				.Property(e => e.Text)
+            modelBuilder.Entity<EmployeeRecord>()
+                .HasMany(e => e.Notes)
+                .WithRequired(e => e.Employee)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<NoteRecord>()
+				.Property(e => e.Comment)
 				.IsUnicode(false);
 
-			modelBuilder.Entity<NoteRecord>()
+            modelBuilder.Entity<NoteRecord>()
+                .Property(e => e.DocumentLocation)
+                .IsUnicode(false);
+            modelBuilder.Entity<NoteRecord>()
+                .Property(e => e.DocumentName)
+                .IsUnicode(false);
+            modelBuilder.Entity<NoteRecord>()
+               .Property(e => e.FileType)
+               .IsUnicode(false);
+
+            modelBuilder.Entity<NoteRecord>()
 				.Property(e => e.CreatedBy)
 				.IsUnicode(false);
 
 			modelBuilder.Entity<NoteRecord>()
 				.Property(e => e.UpdatedBy)
 				.IsUnicode(false);
-		
+
+			modelBuilder.Entity<ImportRecord>()
+			.Property(e => e.Source)
+			.IsUnicode(false);
+
+			modelBuilder.Entity<ImportRecord>()
+				.Property(e => e.CreatedBy)
+				.IsUnicode(false);
+
+			modelBuilder.Entity<ImportRecord>()
+				.Property(e => e.UpdatedBy)
+				.IsUnicode(false);
+
+
 		}
 	}
 

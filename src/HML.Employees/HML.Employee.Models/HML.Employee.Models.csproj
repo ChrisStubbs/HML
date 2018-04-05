@@ -42,6 +42,10 @@
       <HintPath>..\packages\FluentValidation.7.4.0\lib\net45\FluentValidation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -62,6 +66,7 @@
     <Compile Include="Entities\ClientSpecificFieldRecord.cs" />
     <Compile Include="Entities\ClientSpecificFieldConfigRecord.cs" />
     <Compile Include="Entities\FieldType.cs" />
+    <Compile Include="Entities\ImportRecord.cs" />
     <Compile Include="Entities\NoteRecord.cs" />
     <Compile Include="Entities\ContactRecord.cs" />
     <Compile Include="Entities\ContactType.cs" />
@@ -70,7 +75,12 @@
     <Compile Include="Entities\IBaseEntity.cs" />
     <Compile Include="Entities\IEmployeeChild.cs" />
     <Compile Include="ClientContext.cs" />
+    <Compile Include="NoteContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\EmployeeImportMatchCriteria.cs" />
+    <Compile Include="ViewModels\EmployeeImportResults.cs" />
+    <Compile Include="ViewModels\EmployeeImportMatchCriteriaComparer.cs" />
+    <Compile Include="ViewModels\IEmployeeImportMatchCriteria.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Entities\App.config" />

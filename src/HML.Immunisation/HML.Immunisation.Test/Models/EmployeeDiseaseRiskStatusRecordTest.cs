@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using HML.Immunisation.Models.Entities;
+using HML.Immunisation.Test.Factories;
 using NUnit.Framework;
 
 namespace HML.Immunisation.Test.Models
@@ -61,6 +62,51 @@ namespace HML.Immunisation.Test.Models
 				return status.IsDateProtectedSetWhenStatusNotProtected();
 			}
 
+		}
+
+
+		public class TheHasRecallDateChangedToValueInThePastMethod : EmployeeDiseaseRiskStatusRecordTest
+		{
+			public void ReturnsFalseIfRecallDateNull()
+			{
+				var rec = new EmployeeDiseaseRiskStatusRecordFactory().With(x=> x.RecallDate = null).Build();
+				Assert.That(rec.HasRecallDateChangedToValueInThePast(new EmployeeDiseaseRiskStatusRecord()),Is.False);
+			}
+
+			public static IEnumerable TestCases
+			{
+				get
+				{
+					yield return new TestCaseData(
+						new EmployeeDiseaseRiskStatusRecordFactory().With(x => x.RecallDate = DateTime.Today).Build(),
+						new EmployeeDiseaseRiskStatusRecordFactory().With(x => x.RecallDate = DateTime.Today).Build()
+						).Returns(false);
+
+					yield return new TestCaseData(
+						new EmployeeDiseaseRiskStatusRecordFactory().With(x => x.RecallDate = DateTime.Today.AddDays(-1)).Build(),
+						new EmployeeDiseaseRiskStatusRecordFactory().With(x => x.RecallDate = DateTime.Today).Build()
+						).Returns(true);
+
+					yield return new TestCaseData(
+						new EmployeeDiseaseRiskStatusRecordFactory().With(x => x.RecallDate = DateTime.Today).Build(),
+						new EmployeeDiseaseRiskStatusRecordFactory().With(x => x.RecallDate = null).Build()
+					).Returns(false);
+
+					yield return new TestCaseData(
+						new EmployeeDiseaseRiskStatusRecordFactory().With(x => x.RecallDate = DateTime.Today.AddDays(-1)).Build(),
+						new EmployeeDiseaseRiskStatusRecordFactory().With(x => x.RecallDate = null).Build()
+						).Returns(true);
+
+				}
+			}
+
+			[TestCaseSource(typeof(TheHasRecallDateChangedToValueInThePastMethod), nameof(TestCases))]
+			public bool TestHasRecallDateChangedToValueInThePast(
+				EmployeeDiseaseRiskStatusRecord recordUnderTest,
+				EmployeeDiseaseRiskStatusRecord originalRecord)
+			{
+				return recordUnderTest.HasRecallDateChangedToValueInThePast(originalRecord);
+			}
 		}
 	}
 }

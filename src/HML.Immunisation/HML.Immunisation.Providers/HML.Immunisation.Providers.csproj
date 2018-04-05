@@ -55,10 +55,12 @@
   <ItemGroup>
     <Compile Include="ClientSettingsProvider.cs" />
     <Compile Include="DiseaseRiskProvider.cs" />
+    <Compile Include="ImmunisationStatusProvider.cs" />
     <Compile Include="Interfaces\IEmployeeDiseaseRiskStatusProvider.cs" />
     <Compile Include="Interfaces\IClientSettingsProvider.cs" />
     <Compile Include="Interfaces\IDiseaseRiskProvider.cs" />
     <Compile Include="EmployeeDiseaseRiskStatusProvider.cs" />
+    <Compile Include="Interfaces\IImmunisationStatusProvider.cs" />
     <Compile Include="Interfaces\ILookupsProvider.cs" />
     <Compile Include="LookupsProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

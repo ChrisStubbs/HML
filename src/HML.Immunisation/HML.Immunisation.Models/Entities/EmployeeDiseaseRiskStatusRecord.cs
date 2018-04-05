@@ -63,7 +63,7 @@ namespace HML.Immunisation.Models.Entities
 			return true;
 		}
 
-		public bool HasRecallDateChangedToValueInThePast(EmployeeDiseaseRiskStatusRecord originalRecord)
+		public virtual bool HasRecallDateChangedToValueInThePast(EmployeeDiseaseRiskStatusRecord originalRecord)
 		{
 			if (RecallDate.HasValue)
 			{

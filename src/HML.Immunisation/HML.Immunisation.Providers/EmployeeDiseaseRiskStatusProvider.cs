@@ -108,13 +108,19 @@ namespace HML.Immunisation.Providers
 			return await Search(ByEmployeeDiseaseRiskWithDeleted(employeeId, diseaseRiskId));
 		}
 
-		public int NoOfEmployeesWithDiseaseRiskRequiredForRole(int diseaseriskId)
+		public int NoOfEmployeesWithDiseaseRiskRequiredForRole(Guid clientId, int diseaseriskId)
 		{
 			try
 			{
 				using (var db = GetDbContext())
 				{
-					return db.EmployeeDiseaseRiskStatuses.Count(x => x.IsRequired == true && x.DiseaseRiskId == diseaseriskId);
+					return db.EmployeeDiseaseRiskStatuses.Count(
+						x => 
+						!x.IsDeleted
+						&& x.IsRequired 
+						&& x.DiseaseRiskId == diseaseriskId 
+						&& x.ClientId == clientId
+						);
 				}
 			}
 			catch (Exception ex)

@@ -92,7 +92,7 @@ namespace HML.Immunisation.WebAPI.Controllers
 				}
 
 
-                return BadRequest(ModelState);
+				return BadRequest(ModelState);
 			}
 			catch (Exception e)
 			{
@@ -100,24 +100,23 @@ namespace HML.Immunisation.WebAPI.Controllers
 				return InternalServerError(e);
 			}
 		}
-        [HttpPut]
-        [Route("employees/{employeeId:int}/validate")]
-        public async Task<IHttpActionResult> ValidateAsync(int employeeId,IList<EmployeeDiseaseRiskStatusRecord> diseaseRiskStatusRecords)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                        return Ok();
-
-                }
-                return BadRequest(ModelState);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError($"Error when validating Disease Risk Status.", e);
-                return InternalServerError(e);
-            }
-        }
-    }
+		[HttpPut]
+		[Route("employees/{employeeId:int}/validate")]
+		public IHttpActionResult Validate(int employeeId, IList<EmployeeDiseaseRiskStatusRecord> diseaseRiskStatusRecords)
+		{
+			try
+			{
+				if (ModelState.IsValid)
+				{
+					return Ok();
+				}
+				return BadRequest(ModelState);
+			}
+			catch (Exception e)
+			{
+				_logger.LogError($"Error when validating Disease Risk Status.", e);
+				return InternalServerError(e);
+			}
+		}
+	}
 }

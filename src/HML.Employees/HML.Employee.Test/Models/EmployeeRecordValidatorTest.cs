@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentValidation.TestHelper;
 using HML.Employee.Models.Entities;
+using HML.Employee.Providers.Interfaces;
 using HML.Employee.WebAPI.Validators;
 using Moq;
 using NUnit.Framework;
@@ -10,7 +11,16 @@ namespace HML.Employee.Test.Models
 	[TestFixture]
 	public class EmployeeRecordValidatorTests
 	{
-		private readonly EmployeeRecordValidator _validator = new EmployeeRecordValidator();
+		private Mock<IEmployeeProvider> _employeeProvider;
+		private EmployeeRecordValidator _validator;
+
+		[SetUp]
+		public void SetUp()
+		{
+			_employeeProvider = new Mock<IEmployeeProvider>();
+			_validator = new EmployeeRecordValidator(_employeeProvider.Object);
+		}
+
 		public class TitleValidation : EmployeeRecordValidatorTests
 		{
 			[Test]
@@ -25,11 +35,6 @@ namespace HML.Employee.Test.Models
 				_validator.ShouldNotHaveValidationErrorFor(x => x.Title, Helpers.RandomString(50));
 			}
 
-			[Test]
-			public void TitleValidIfNull()
-			{
-				_validator.ShouldNotHaveValidationErrorFor(x => x.Title, (string)null);
-			}
 		}
 
 		public class EmployeeIdValidation : EmployeeRecordValidatorTests
@@ -37,19 +42,34 @@ namespace HML.Employee.Test.Models
 			[Test]
 			public void EmployeeIdInvalidIfGreaterThan50()
 			{
+				_employeeProvider.Setup(x => x.IsEmployeeIdIsUniqueForClient(It.IsAny<EmployeeRecord>())).Returns(true);
 				_validator.ShouldHaveValidationErrorFor(x => x.EmployeeId, Helpers.RandomString(51));
 			}
 
 			[Test]
 			public void EmployeeIdValidIfLessThanOrEqualTo50()
 			{
+				_employeeProvider.Setup(x => x.IsEmployeeIdIsUniqueForClient(It.IsAny<EmployeeRecord>())).Returns(true);
 				_validator.ShouldNotHaveValidationErrorFor(x => x.EmployeeId, Helpers.RandomString(50));
 			}
 
 			[Test]
-			public void EmployeeIdValidIfNull()
+			public void EmployeeIdInValidIfEmployeeIdNotUnique()
 			{
+				_employeeProvider.Setup(x => x.IsEmployeeIdIsUniqueForClient(It.IsAny<EmployeeRecord>())).Returns(true);
 				_validator.ShouldNotHaveValidationErrorFor(x => x.EmployeeId, (string)null);
+			}
+
+			[Test]
+			public void EmployeeIdNotValidIfIdNotUnique()
+			{
+				var emp = new EmployeeRecord();
+				_employeeProvider.Setup(x => x.IsEmployeeIdIsUniqueForClient(emp)).Returns(false);
+
+				_validator.ShouldHaveValidationErrorFor(x => x.EmployeeId, emp);
+
+				_employeeProvider.Verify(x => x.IsEmployeeIdIsUniqueForClient(emp), Times.Once);
+
 			}
 		}
 
@@ -142,7 +162,7 @@ namespace HML.Employee.Test.Models
 				var emp = new Mock<EmployeeRecord>();
 				emp.Setup(x => x.IsEndDateGreaterThanStartDate()).Returns(true);
 				_validator.ShouldNotHaveValidationErrorFor(x => x.EndDate, emp.Object);
-				emp.Verify(x=> x.IsEndDateGreaterThanStartDate(),Times.Once);
+				emp.Verify(x => x.IsEndDateGreaterThanStartDate(), Times.Once);
 			}
 
 			[Test]
@@ -157,7 +177,7 @@ namespace HML.Employee.Test.Models
 			[Test]
 			public void IfEndDateIsSetAndUserIsActiveValidationError()
 			{
-				var emp = new EmployeeRecord { EndDate = DateTime.Now, IsActive = true};
+				var emp = new EmployeeRecord { EndDate = DateTime.Now, IsActive = true };
 				_validator.ShouldHaveValidationErrorFor(x => x.EndDate, emp);
 			}
 
@@ -210,11 +230,11 @@ namespace HML.Employee.Test.Models
 		public class DateOfBirthValidation : EmployeeRecordValidatorTests
 		{
 			[Test]
-			public void DateOfBirthInValidIfNull()
+			public void DateOfBirthInValidIfDateInFuture()
 			{
-				_validator.ShouldHaveValidationErrorFor(x => x.DateOfBirth, (DateTime?)null);
+				_validator.ShouldHaveValidationErrorFor(x => x.DateOfBirth, DateTime.Today.AddDays(1));
 			}
-			
+
 		}
 
 

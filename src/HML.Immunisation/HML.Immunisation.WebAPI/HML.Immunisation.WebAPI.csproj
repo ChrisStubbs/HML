@@ -130,13 +130,21 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
-    <Content Include="Web.config" />
+    <Content Include="Web.TEMPLATE.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Web.TEMPLATE.config</LastGenOutput>
+    </Content>
+    <Content Include="Web.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Web.config</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityWebApiActivator.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\EmployeeDiseaseRiskStatusController.cs" />
+    <Compile Include="Controllers\ImmunisationStatusController.cs" />
     <Compile Include="Controllers\LookupsController.cs" />
     <Compile Include="Controllers\ClientSettingsController.cs" />
     <Compile Include="Controllers\DiseaseRiskController.cs" />
@@ -145,9 +153,12 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\AutoMapperConfig.cs" />
+    <Compile Include="Infrastructure\CachedEmployeeDiseaseRiskStatusProvider.cs" />
     <Compile Include="Infrastructure\CachedLookupProvider.cs" />
     <Compile Include="Infrastructure\Configuration.cs" />
     <Compile Include="Infrastructure\CachedDiseaseRiskProvider.cs" />
+    <Compile Include="Infrastructure\HttpRequestCache.cs" />
+    <Compile Include="Infrastructure\ICachedEmployeeDiseaseRiskStatusProvider.cs" />
     <Compile Include="Infrastructure\UnityValidatorFactory.cs" />
     <Compile Include="Infrastructure\WebApiExceptionLogger.cs" />
     <Compile Include="Infrastructure\WebUsernameProvider.cs" />
@@ -162,11 +173,17 @@
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
+    <Content Include="Web.config">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Web.tt</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Nlog.config" />
+    <None Include="Web.TEMPLATE.config">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Web.TEMPLATE.tt</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -188,6 +205,9 @@
       <Project>{eb80b4fe-5028-428b-88a9-4fd86dd7586e}</Project>
       <Name>HML.Immunisation.Providers</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -5,8 +5,8 @@ using HML.Employee.Common.Interfaces;
 using HML.Employee.Providers;
 using HML.Employee.Providers.Interfaces;
 using HML.Employee.WebAPI.Infrastructure;
-using HML.Employee.WebAPI.Validators;
 using Unity;
+using Unity.Injection;
 
 namespace HML.Employee.WebAPI
 {
@@ -47,20 +47,28 @@ namespace HML.Employee.WebAPI
 			// container.LoadConfiguration();
 
 			// TODO: Register your type's mappings here.
-			
+
 			container.RegisterType<ILogger, NLogger>();
-			container.RegisterType<IConfiguration, Infrastructure.Configuration>();
-			container.RegisterType<IEmployeeProvider, EmployeeProvider>();
+			container.RegisterType<IConfiguration, Configuration>();
 			container.RegisterType<IUsernameProvider, WebUsernameProvider>();
+			container.RegisterType<IEmployeeProvider, EmployeeProvider>();
 			container.RegisterType<IClientSpecificFieldConfigProvider, ClientSpecificFieldConfigProvider>();
 			container.RegisterType<IExceptionLogger, WebApiExceptionLogger>();
-			//register all validators
-			FluentValidation.AssemblyScanner.FindValidatorsInAssemblyContaining<AddressRecordValidator>()
-				.ForEach(result =>
-				{
-					container.RegisterType(result.InterfaceType, result.ValidatorType);
+			container.RegisterType<INoteProvider, NoteProvider>();
+			container.RegisterType<ICacheService, HttpRequestCache>("HttpRequestCache");
+			container.RegisterType<ICachedEmployeeImportValidatorProvider, CachedEmployeeImportValidatorProvider>(
+				new InjectionConstructor(new ResolvedParameter<ICacheService>("HttpRequestCache"),
+										new ResolvedParameter<IEmployeeProvider>()));
 
-				});
+			//register all validators
+			FluentValidation.AssemblyScanner.FindValidatorsInAssemblyContaining<UnityValidatorFactory>()
+			.ForEach(result =>
+			{
+				container.RegisterType(result.InterfaceType, result.ValidatorType);
+			});
+
+			container.RegisterType<IEmployeeImportProvider, EmployeeImportProvider>();
+
 		}
 	}
 }
